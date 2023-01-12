@@ -20,4 +20,5 @@ jobs:
       - deploy:
           name: Push Application Docker image
           command: |
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME
