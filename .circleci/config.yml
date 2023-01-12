@@ -5,6 +5,9 @@ jobs:
     working_directory: ./app
     docker:
       - image: docker:23.0-rc-cli
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
     steps:
       - checkout
       - setup_remote_docker:
@@ -17,5 +20,4 @@ jobs:
       - deploy:
           name: Push Application Docker image
           command: |
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME
