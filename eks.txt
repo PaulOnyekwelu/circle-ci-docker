@@ -1,0 +1,76 @@
+Step 1: Create IAM Roles for the EKS Cluster and Node Group
+Create EKS Cluster IAM role:
+Navigate to the Roles tab in the Identity and Access Management (IAM) dashboard in the AWS Console
+Click Create role
+Select type of trusted entity:
+Choose EKS as the use case
+Select EKS-Cluster
+Click Next: Permissions
+Click Next: Tags
+Click Next: Review
+Give the role a name, e.g. EKSClusterRole
+Click Create role
+You should see a message saying The role AWSServiceRoleForAmazonEKS has been created.
+
+Create EKS Cluster Node Group:
+In the IAM Roles tab, click Create role
+Select type of trusted entity:
+Choose EC2 as the use case
+Select EC2
+Click Next: Permissions
+In Attach permissions policies, search for each of the following and check the box to the left of the policy to attach it to the role:
+AWS AmazonEC2ContainerRegistryReadOnly
+AmazonEKSWorkerNodePolicy
+AmazonEKS_CNI_Policy
+Click Next: Tags
+Click Next: Review
+Give the role a name, e.g. NodeRole
+Click Create role
+You should see a message saying The role AWSServiceRoleForAmazonEKSNodegroup has been created.
+
+
+Step 2: Create an SSH Pair
+Navigate to the Key pairs tab in the EC2 Dashboard
+Click Create key pair
+Give the key pair a name, e.g. mykeypair
+Select RSA and .pem
+Click Create key pair
+
+
+Step 3: Create an EKS Cluster
+Navigate to the Clusters tab in Amazon EKS dashboard in the AWS Console
+Click Create cluster
+Specify:
+a unique Name (e.g. MyEKSCluster)
+Kubernetes Version (e.g. 1.21)
+Cluster Service Role (select the role you created above, e.g.EKSClusterRole)
+Click Next
+In Specify networking look for Cluster endpoint access, click the Public radio button
+Click Next and Next
+In Review and create, click Create
+It may take 5-15 minutes for the EKS cluster to be created.
+
+Troubleshooting: If you get a message like this: Cannot create cluster the targeted availability zone does not currently have sufficient capacity to support the cluster, choose another availability zone and try again. You can set the availability zone in the upper right corner of your AWS console.
+
+
+Step 4: Create a Node Group
+Click on the Compute tab in the newly-created cluster
+Click Add Node Group
+Specify:
+a unique Name (e.g. MyNodeGroup)
+Cluster Service Role (select the role you created above, e.g.NodeRole)
+Create and specify SSH key for node group
+In Node Group compute configuration, set instance type to 8t3.micro and disk size to 4* to minimize costs
+In Node Group scaling configuration, set the number of nodes to 2
+Click Next
+In Node Group network configuration, toggle on Configure SSH access to nodes
+Select the EC2 pair created above (e.g. mykeypair)
+Select All
+Click Next
+Review the configuration and click "Create"
+
+
+binding aws eks to local kubectl:
+aws eks --region us-east-1 update-kubeconfig --name <eks name>
+kubectl apply -f <deployment file>
+kubectl apply -f <service file>
